@@ -62,7 +62,7 @@ class PDADialog(QtWidgets.QDialog):
 
     def setup_states_tab(self):
         layout = QtWidgets.QVBoxLayout()
-        
+
         # Add State Section
         add_state_layout = QtWidgets.QHBoxLayout()
         self.new_state_input = QtWidgets.QLineEdit()
@@ -71,32 +71,32 @@ class PDADialog(QtWidgets.QDialog):
         add_state_btn.clicked.connect(self.add_state)
         add_state_layout.addWidget(self.new_state_input)
         add_state_layout.addWidget(add_state_btn)
-        
+
         # States List
         self.states_list = QtWidgets.QListWidget()
-        
+
         # Initial/Final Selection
         state_controls = QtWidgets.QHBoxLayout()
-        
+
         # Initialize groups
         self.initial_group = QtWidgets.QGroupBox("Initial State")
         self.final_group = QtWidgets.QGroupBox("Final States")
-        
+
         # Initialize checkbox list
         self.final_checkboxes = []
-        
+
         # Initial State
         self.initial_radio_group = QtWidgets.QButtonGroup()
         initial_layout = QtWidgets.QVBoxLayout()
         self.initial_group.setLayout(initial_layout)
-        
+
         # Final States
         final_layout = QtWidgets.QVBoxLayout()
         self.final_group.setLayout(final_layout)
-        
+
         state_controls.addWidget(self.initial_group)
         state_controls.addWidget(self.final_group)
-        
+
         layout.addLayout(add_state_layout)
         layout.addWidget(self.states_list)
         layout.addLayout(state_controls)
@@ -303,26 +303,142 @@ class PDADialog(QtWidgets.QDialog):
 class MainWindow(object):
     def setupUi(self, main_window):
         main_window.setObjectName("main_window")
-        main_window.resize(800, 600)
+        main_window.resize(1200, 800)
         
+        
+        # Application-wide stylesheet
+        main_window.setStyleSheet("""
+            QMainWindow {
+                background-color: #2b2b2b;
+            }
+            QMenuBar {
+                background-color: #353535;
+                color: #ffffff;
+                border: 1px solid #444;
+                padding: 4px;
+            }
+            QMenuBar::item {
+                padding: 5px 15px;
+            }
+            QMenuBar::item:selected {
+                background: #505050;
+                border-radius: 3px;
+            }
+            QMenu {
+                background-color: #353535;
+                color: #ffffff;
+                border: 1px solid #444;
+                padding: 5px;
+            }
+            QMenu::item:selected {
+                background-color: #505050;
+                border-radius: 3px;
+            }
+            QWidget {
+                background-color: #2b2b2b;
+                color: #ffffff;
+            }
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 4px;
+                min-width: 80px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+            QLineEdit {
+                background-color: #353535;
+                color: #ffffff;
+                border: 1px solid #444;
+                padding: 7px;
+                border-radius: 3px;
+            }
+            QListWidget {
+                background-color: #353535;
+                color: #ffffff;
+                border: 1px solid #444;
+                border-radius: 3px;
+                alternate-background-color: #3d3d3d;
+            }
+            QTableWidget {
+                background-color: #353535;
+                color: #ffffff;
+                gridline-color: #444;
+                border-radius: 3px;
+            }
+            QHeaderView::section {
+                background-color: #404040;
+                color: white;
+                border: 1px solid #444;
+                padding: 5px;
+            }
+            QGroupBox {
+                color: #4CAF50;
+                border: 1px solid #444;
+                margin-top: 10px;
+                padding-top: 15px;
+                border-radius: 4px;
+            }
+            QTabWidget::pane {
+                border: 1px solid #444;
+                border-radius: 4px;
+                margin-top: -1px;
+            }
+            QTabBar::tab {
+                background: #353535;
+                color: white;
+                padding: 8px 15px;
+                border: 1px solid #444;
+                border-bottom: none;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+            }
+            QTabBar::tab:selected {
+                background: #505050;
+                border-color: #444;
+            }
+            QScrollBar:vertical {
+                background: #353535;
+                width: 12px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background: #505050;
+                min-height: 20px;
+                border-radius: 6px;
+            }
+        """)
+
         # Central Widget Setup
         self.central_widget = QtWidgets.QWidget(main_window)
         self.central_widget.setObjectName("central_widget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.central_widget)
-        self.horizontalLayout.setContentsMargins(11, 11, 11, 11)
-        self.horizontalLayout.setSpacing(6)
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.horizontalLayout.setContentsMargins(20, 20, 20, 20)  # Increased padding
+        self.horizontalLayout.setSpacing(15)
         
+        # SVG Display Area
         self.center_image = QtSvg.QSvgWidget(self.central_widget)
-        self.center_image.setObjectName("center_image")
+        self.center_image.setStyleSheet("""
+            background-color: #353535;
+            border: 2px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+        """)
         self.horizontalLayout.addWidget(self.center_image)
+        
         main_window.setCentralWidget(self.central_widget)
 
         # Menu System Setup
         self.menu_bar = QtWidgets.QMenuBar(main_window)
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1200, 24))  # Adjusted height
         self.menu_bar.setObjectName("menu_bar")
-        
+
         # Create menus
         self.menu_file = QtWidgets.QMenu(self.menu_bar)
         self.menu_file.setObjectName("menu_file")
@@ -333,46 +449,24 @@ class MainWindow(object):
         self.menu_pda = QtWidgets.QMenu(self.menu_bar)
         self.menu_pda.setObjectName("menu_pda")
 
-        # Create Actions
+        # Create actions
         self.action_new_pda = QtWidgets.QAction(main_window)
-        self.action_new_pda.setObjectName("action_new_pda")
-        
         self.action_open_pda = QtWidgets.QAction(main_window)
-        self.action_open_pda.setIconVisibleInMenu(False)
-        self.action_open_pda.setObjectName("action_open_pda")
-        
         self.action_exit = QtWidgets.QAction(main_window)
-        self.action_exit.setObjectName("action_exit")
-        
         self.action_about = QtWidgets.QAction(main_window)
-        self.action_about.setObjectName("action_about")
-        
         self.action_gv = QtWidgets.QAction(main_window)
-        self.action_gv.setObjectName("action_gv")
-        
         self.action_pdf = QtWidgets.QAction(main_window)
-        self.action_pdf.setObjectName("action_pdf")
-        
         self.action_png = QtWidgets.QAction(main_window)
-        self.action_png.setObjectName("action_png")
-        
         self.action_svg = QtWidgets.QAction(main_window)
-        self.action_svg.setObjectName("action_svg")
-        
         self.action_convert = QtWidgets.QAction(main_window)
-        self.action_convert.setObjectName("action_convert")
 
-        # Connect Actions
-        self.action_new_pda.triggered.connect(self.new_pda)
-        self.action_open_pda.triggered.connect(self.open_pda)
-        self.action_exit.triggered.connect(self.app_exit)
-        self.action_about.triggered.connect(self.show_about_dialog)
-        self.action_gv.triggered.connect(lambda: self.export_as('gv'))
-        self.action_pdf.triggered.connect(lambda: self.export_as('pdf'))
-        self.action_png.triggered.connect(lambda: self.export_as('png'))
-        self.action_svg.triggered.connect(lambda: self.export_as('svg'))
-        self.action_convert.triggered.connect(self.convert_to_cfg)
-
+        # Font settings
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        main_window.setFont(font)
+        self.menu_bar.setFont(font)
+###############################
         # Build Menu Structure
         self.menu_export_as.addAction(self.action_gv)
         self.menu_export_as.addAction(self.action_pdf)
@@ -398,6 +492,17 @@ class MainWindow(object):
         self.retranslateUi(main_window)
         QtCore.QMetaObject.connectSlotsByName(main_window)
         self.set_menu_state(False)
+        
+        # Add after the retranslateUi() call in setupUi
+        self.action_new_pda.triggered.connect(self.new_pda)
+        self.action_open_pda.triggered.connect(self.open_pda)
+        self.action_exit.triggered.connect(self.app_exit)
+        self.action_convert.triggered.connect(self.convert_to_cfg)
+        self.action_gv.triggered.connect(lambda: self.export_as('gv'))
+        self.action_pdf.triggered.connect(lambda: self.export_as('pdf'))
+        self.action_png.triggered.connect(lambda: self.export_as('png'))
+        self.action_svg.triggered.connect(lambda: self.export_as('svg'))
+        self.action_about.triggered.connect(self.show_about_dialog)
 
     def retranslateUi(self, main_window):
         _translate = QtCore.QCoreApplication.translate
@@ -508,4 +613,4 @@ class MainWindow(object):
         )
 
     def app_exit(self):
-        sys.exit(0)
+        QtWidgets.QApplication.quit()
