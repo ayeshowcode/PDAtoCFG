@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'mainwindow.ui'
-#
-# Created by: PyQt5 UI code generator 5.12.2
-#
-# WARNING! All changes made in this file will be lost!
-
 import sys
 from pda import PDA
 from graphviz import Digraph
@@ -419,24 +411,87 @@ class MainWindow(object):
         self.central_widget = QtWidgets.QWidget(main_window)
         self.central_widget.setObjectName("central_widget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.central_widget)
-        self.horizontalLayout.setContentsMargins(20, 20, 20, 20)  # Increased padding
+        self.horizontalLayout.setContentsMargins(20, 20, 20, 20)
         self.horizontalLayout.setSpacing(15)
+            
+        # A stacked widget to switch between views
+        self.stacked_widget = QtWidgets.QStackedWidget()
+        self.horizontalLayout.addWidget(self.stacked_widget)
         
+        # Welcome/Instruction Screen
+        self.welcome_widget = QtWidgets.QWidget()
+        welcome_layout = QtWidgets.QVBoxLayout()
+        
+        # Title label
+        title_label = QtWidgets.QLabel("PDA to CFG Converter")
+        title_label.setStyleSheet("""
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            padding: 20px;
+        """)
+        title_label.setAlignment(QtCore.Qt.AlignCenter)
+        welcome_layout.addWidget(title_label)
+        
+        # instructions
+        instructions = [
+            "1. Click 'New PDA' to define a new Pushdown Automaton",
+            "2. Or 'Open PDA' to load an existing PDA from XML",
+            "3. Visualize your PDA in the diagram view",
+            "4. Click 'Convert to CFG' to generate equivalent Context-Free Grammar",
+            "5. Export the diagram in various formats (SVG, PNG, PDF)"
+        ]
+        
+        for instruction in instructions:
+            label = QtWidgets.QLabel(instruction)
+            label.setStyleSheet("font-size: 14px; padding: 5px;")
+            welcome_layout.addWidget(label)
+        
+        # Example PDA info
+        example_label = QtWidgets.QLabel("\nExample PDA for aⁿbⁿ:")
+        example_label.setStyleSheet("font-size: 14px; font-weight: bold; padding-top: 15px;")
+        welcome_layout.addWidget(example_label)
+        
+        example_text = QtWidgets.QTextEdit()
+        example_text.setReadOnly(True)
+        example_text.setPlainText("""States: q0, q1, q2
+    Initial: q0
+    Final: q2
+    Input Alphabets: a, b
+    Stack Alphabets: z, 0
+    Stack Tail: z
+    Transitions:
+    - q0 -> q0: a,z → 0z
+    - q0 -> q0: a,0 → 00
+    - q0 -> q1: b,0 → λ
+    - q1 -> q1: b,0 → λ
+    - q1 -> q2: λ,z → z""")
+        example_text.setStyleSheet("background: #353535; border: 1px solid #444;")
+        welcome_layout.addWidget(example_text)
+        
+        welcome_layout.addStretch()
+        self.welcome_widget.setLayout(welcome_layout)
+
         # SVG Display Area
-        self.center_image = QtSvg.QSvgWidget(self.central_widget)
+        self.visualization_widget = QtWidgets.QWidget()
+        vis_layout = QtWidgets.QVBoxLayout(self.visualization_widget)  # Create layout and assign to widget
+        self.center_image = QtSvg.QSvgWidget()
         self.center_image.setStyleSheet("""
             background-color: #353535;
             border: 2px solid #444;
             border-radius: 5px;
             padding: 10px;
         """)
-        self.horizontalLayout.addWidget(self.center_image)
+        vis_layout.addWidget(self.center_image)
         
+        self.stacked_widget.addWidget(self.welcome_widget)
+        self.stacked_widget.addWidget(self.visualization_widget)
+        self.stacked_widget.setCurrentIndex(0)
         main_window.setCentralWidget(self.central_widget)
 
         # Menu System Setup
         self.menu_bar = QtWidgets.QMenuBar(main_window)
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1200, 24))  # Adjusted height
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1200, 24))
         self.menu_bar.setObjectName("menu_bar")
 
         # Create menus
@@ -504,6 +559,8 @@ class MainWindow(object):
         self.action_svg.triggered.connect(lambda: self.export_as('svg'))
         self.action_about.triggered.connect(self.show_about_dialog)
 
+        self.show_welcome_screen()
+        
     def retranslateUi(self, main_window):
         _translate = QtCore.QCoreApplication.translate
         main_window.setWindowTitle(_translate("main_window", "PDA to CFG"))
@@ -557,31 +614,41 @@ class MainWindow(object):
             QtWidgets.QMessageBox.critical(self.central_widget, "Error", str(e))
 
     def render_pda(self):
-        f = Digraph('pda_machine', filename='pda_tmp.gv', format='svg')
-        f.attr(rankdir='LR', size='8,5')
-        
-        # Initial state
-        f.attr('node', shape='plaintext')
-        f.node(' ')
-        f.attr('node', shape='circle')
-        f.node(self.pda.initial_state)
-        f.edge(' ', self.pda.initial_state, ' ')
-        
-        # Final states
-        f.attr('node', shape='doublecircle')
-        for fs in self.pda.final_states:
-            f.node(fs)
-        
-        # Transitions
-        f.attr('node', shape='circle')
-        for tr in self.pda.transitions:
-            label = f"{PDA.lamb(tr['input'])},{PDA.lamb(tr['stack_read'])},{PDA.lamb(tr['stack_write'])}"
-            f.edge(tr['source'], tr['destination'], label)
-        
-        f.render()
-        self.center_image.load('pda_tmp.gv.svg')
-        self.graph = f
+        try:
+            f = Digraph('pda_machine', filename='pda_tmp.gv', format='svg')
+            f.attr(rankdir='LR', size='8,5')
+            
+            # Initial state
+            f.attr('node', shape='plaintext')
+            f.node(' ')
+            f.attr('node', shape='circle')
+            f.node(self.pda.initial_state)
+            f.edge(' ', self.pda.initial_state, ' ')
+            
+            # Final states
+            f.attr('node', shape='doublecircle')
+            for fs in self.pda.final_states:
+                f.node(fs)
+            
+            # Transitions
+            f.attr('node', shape='circle')
+            for tr in self.pda.transitions:
+                label = f"{PDA.lamb(tr['input'])},{PDA.lamb(tr['stack_read'])},{PDA.lamb(tr['stack_write'])}"
+                f.edge(tr['source'], tr['destination'], label)
+            
+            f.render()
+            self.center_image.load('pda_tmp.gv.svg')
+            self.graph = f
 
+            # Switch to visualization view
+            self.stacked_widget.setCurrentIndex(1)
+            self.set_menu_state(True)
+            
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self.central_widget, "Error", str(e))
+            # Stay on welcome screen if error occurs
+            self.stacked_widget.setCurrentIndex(0)
+            self.show_welcome_screen()
     def export_as(self, file_type):
         file_name, _ = QtWidgets.QFileDialog.getSaveFileName(
             self.central_widget, 
@@ -611,6 +678,10 @@ class MainWindow(object):
             'About', 
             'PDA to CFG Converter\nVersion 1.0\nCreated by AliReza Beitari'
         )
+
+    def show_welcome_screen(self):
+        self.stacked_widget.setCurrentIndex(0)
+        self.set_menu_state(False)
 
     def app_exit(self):
         QtWidgets.QApplication.quit()
