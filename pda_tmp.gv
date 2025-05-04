@@ -6,11 +6,7 @@ digraph pda_machine {
 	q0
 	" " -> q0 [label=" "]
 	node [shape=doublecircle]
-	q2
+	q1
 	node [shape=circle]
-	q0 -> q0 [label="a,z,0z"]
-	q0 -> q0 [label="a,a,00"]
-	q0 -> q1 [label="b,0,λ"]
-	q1 -> q1 [label="b,0,λ"]
-	q1 -> q2 [label="λ,z,Az"]
+	q0 -> q0 [label="a,Z,AZ"]
 }

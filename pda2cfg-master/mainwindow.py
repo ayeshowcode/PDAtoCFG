@@ -78,20 +78,24 @@ class PDADialog(QtWidgets.QDialog):
         # Initial/Final Selection
         state_controls = QtWidgets.QHBoxLayout()
         
+        # Initialize groups
+        self.initial_group = QtWidgets.QGroupBox("Initial State")
+        self.final_group = QtWidgets.QGroupBox("Final States")
+        
+        # Initialize checkbox list
+        self.final_checkboxes = []
+        
         # Initial State
-        initial_group = QtWidgets.QGroupBox("Initial State")
         self.initial_radio_group = QtWidgets.QButtonGroup()
         initial_layout = QtWidgets.QVBoxLayout()
-        initial_group.setLayout(initial_layout)
+        self.initial_group.setLayout(initial_layout)
         
         # Final States
-        final_group = QtWidgets.QGroupBox("Final States")
-        self.final_checkboxes = []
         final_layout = QtWidgets.QVBoxLayout()
-        final_group.setLayout(final_layout)
+        self.final_group.setLayout(final_layout)
         
-        state_controls.addWidget(initial_group)
-        state_controls.addWidget(final_group)
+        state_controls.addWidget(self.initial_group)
+        state_controls.addWidget(self.final_group)
         
         layout.addLayout(add_state_layout)
         layout.addWidget(self.states_list)
@@ -103,19 +107,17 @@ class PDADialog(QtWidgets.QDialog):
         if state_name and state_name not in self.states:
             self.states.append(state_name)
             self.states_list.addItem(state_name)
-            
-            # Add to initial state radio buttons
-            radio = QtWidgets.QRadioButton(state_name)
+
+            # Fix: Create radio button with proper parent
+            radio = QtWidgets.QRadioButton(state_name, self.initial_group)
             self.initial_radio_group.addButton(radio)
-            initial_layout = self.initial_radio_group.parent().layout()
-            initial_layout.addWidget(radio)
-            
-            # Add to final state checkboxes
-            checkbox = QtWidgets.QCheckBox(state_name)
+            self.initial_group.layout().addWidget(radio)
+
+            # Fix: Create checkbox with proper parent
+            checkbox = QtWidgets.QCheckBox(state_name, self.final_group)
             self.final_checkboxes.append(checkbox)
-            final_layout = self.final_checkboxes[0].parent().layout()
-            final_layout.addWidget(checkbox)
-            
+            self.final_group.layout().addWidget(checkbox)
+
             self.new_state_input.clear()
 
     def setup_alphabets_tab(self):
