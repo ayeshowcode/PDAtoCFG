@@ -104,7 +104,6 @@ class PDA:
         result_cfg = []
 
         for tr in self.transitions:
-            # form of 5-7 (page 222 of book)
             if tr['stack_write'] in ('', 'lambda'):
                 result_cfg.append('({}{}{}) → {}'.format(tr['source'], tr['stack_read'], tr['destination'], PDA.lamb(tr['input'])))
 
