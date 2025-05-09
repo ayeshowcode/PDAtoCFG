@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!-- <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>main_window</class>
  <widget class="QMainWindow" name="main_window">
@@ -135,4 +135,4 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
-</ui>
+</ui> -->
